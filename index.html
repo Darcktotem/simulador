@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏨 Simulador Crédito Hotel - Análisis Personalizado</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        .scenario-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .scenario {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+        .scenario.current {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+        .scenario.proposed {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            text-align: right;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .result-card.current {
+            border-left: 5px solid #dc3545;
+        }
+        .result-card.proposed {
+            border-left: 5px solid #28a745;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .result-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .result-value {
+            font-weight: bold;
+        }
+        .result-value.current {
+            color: #dc3545;
+        }
+        .result-value.proposed {
+            color: #28a745;
+        }
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        .timeline-table th, .timeline-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: center;
+        }
+        .timeline-table th {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .timeline-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .highlight {
+            background: #fff3cd !important;
+            font-weight: bold;
+        }
+        .savings {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .warning {
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏨 Simulador Crédito Hotel</h1>
+        <p style="text-align: center; color: #6c757d; font-size: 1.1em;">Análisis comparativo: Propuesta actual vs Propuesta optimizada</p>
+        
+        <div class="scenario-container">
+            <!-- Escenario Actual -->
+            <div class="scenario current">
+                <h3 style="color: #dc3545;">📊 Propuesta Actual (Banco)</h3>
+                <div class="form-group">
+                    <label>Capital Inicial:</label>
+                    <input type="text" id="capital_actual" value="1.600.000.000" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Cuota Mensual Inicial:</label>
+                    <input type="text" id="cuota_inicial_actual" value="5.000.000" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Cuota Post-77:</label>
+                    <input type="text" id="cuota_post77_actual" value="17.000.000" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Pago Extraordinario Anual:</label>
+                    <input type="text" id="pago_extra_actual" value="200.000.000" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Plazo (años):</label>
+                    <input type="number" id="plazo_actual" value="12" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Tasa Anual (%):</label>
+                    <input type="number" id="tasa_actual" value="16" step="0.1">
+                </div>
+            </div>
+            
+            <!-- Escenario Propuesto -->
+            <div class="scenario proposed">
+                <h3 style="color: #28a745;">💡 Tu Propuesta Optimizada</h3>
+                <div class="form-group">
+                    <label>Capital Inicial:</label>
+                    <input type="text" id="capital_propuesto" value="1.600.000.000" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Cuota Mensual Uniforme:</label>
+                    <input type="text" id="cuota_uniforme" value="8.000.000" data-type="currency">
+                </div>
+                <div class="form-group">
+                    <label>Pago Extraordinario Anual:</label>
+                    <input type="text" id="pago_extra_propuesto" value="100.000.000" data-type="currency">
+                </div>
+                <div class="form-group">
+                    <label>Plazo (años):</label>
+                    <input type="number" id="plazo_propuesto" value="15" min="12" max="20">
+                </div>
+                <div class="form-group">
+                    <label>Tasa Anual (%):</label>
+                    <input type="number" id="tasa_propuesta" value="16" step="0.1">
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="btn" onclick="calcularComparacion()">🔄 Calcular y Comparar Escenarios</button>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h2 style="text-align: center; color: #2c3e50;">📈 Análisis Comparativo</h2>
+            
+            <div class="comparison-grid">
+                <div class="result-card current">
+                    <h4 style="color: #dc3545;">📊 Propuesta Actual</h4>
+                    <div id="resultados_actual"></div>
+                </div>
+                
+                <div class="result-card proposed">
+                    <h4 style="color: #28a745;">💡 Tu Propuesta</h4>
+                    <div id="resultados_propuesto"></div>
+                </div>
+            </div>
+            
+            <div id="analisis_diferencias"></div>
+            
+            <h3 style="color: #2c3e50;">📅 Cronograma de Pagos Comparativo</h3>
+            <div style="overflow-x: auto;">
+                <table class="timeline-table" id="cronograma"></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para formatear números con separadores de miles
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+        
+        // Función para quitar formato y obtener número
+        function parseFormattedNumber(str) {
+            return parseFloat(str.replace(/\./g, '')) || 0;
+        }
+        
+        // Función para formatear campos de entrada
+        function formatCurrencyInput(input) {
+            let value = input.value.replace(/\./g, '');
+            if (value && !isNaN(value)) {
+                input.value = formatNumber(value);
+            }
+        }
+        
+        // Agregar event listeners para formateo automático
+        document.addEventListener('DOMContentLoaded', function() {
+            const currencyInputs = document.querySelectorAll('input[data-type="currency"]');
+            
+            currencyInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    formatCurrencyInput(this);
+                });
+                
+                input.addEventListener('blur', function() {
+                    formatCurrencyInput(this);
+                    calcularComparacion();
+                });
+            });
+        });
+        
+        function calcularComparacion() {
+            // Obtener valores
+            const capital = 1600000000;
+            
+            // Escenario Actual
+            const cuotaInicialActual = 5000000;
+            const cuotaPost77Actual = 17000000;
+            const pagoExtraActual = 200000000;
+            const plazoActual = parseInt(document.getElementById('plazo_actual').value);
+            const tasaActual = parseFloat(document.getElementById('tasa_actual').value);
+            
+            // Escenario Propuesto
+            const cuotaUniforme = parseFormattedNumber(document.getElementById('cuota_uniforme').value);
+            const pagoExtraPropuesto = parseFormattedNumber(document.getElementById('pago_extra_propuesto').value);
+            const plazoPropuesto = parseInt(document.getElementById('plazo_propuesto').value);
+            const tasaPropuesta = parseFloat(document.getElementById('tasa_propuesta').value);
+            
+            // Calcular escenario actual
+            const resultadoActual = calcularEscenarioActual(capital, cuotaInicialActual, cuotaPost77Actual, pagoExtraActual, plazoActual, tasaActual);
+            
+            // Calcular escenario propuesto
+            const resultadoPropuesto = calcularEscenarioPropuesto(capital, cuotaUniforme, pagoExtraPropuesto, plazoPropuesto, tasaPropuesta);
+            
+            // Mostrar resultados
+            mostrarResultados(resultadoActual, resultadoPropuesto);
+            
+            // Generar cronograma
+            generarCronograma(resultadoActual, resultadoPropuesto);
+            
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function calcularEscenarioActual(capital, cuotaInicial, cuotaPost77, pagoExtra, plazo, tasa) {
+            const mesesTotales = plazo * 12;
+            const tasaMensual = tasa / 100 / 12;
+            
+            let saldoPendiente = capital;
+            let totalPagado = 0;
+            let cronograma = [];
+            
+            for (let mes = 1; mes <= mesesTotales; mes++) {
+                let cuotaMensual = mes <= 76 ? cuotaInicial : cuotaPost77;
+                let pagoExtraordinario = (mes % 12 === 0) ? pagoExtra : 0;
+                
+                let interesMes = saldoPendiente * tasaMensual;
+                let capitalMes = cuotaMensual - interesMes;
+                
+                if (capitalMes < 0) capitalMes = 0;
+                
+                saldoPendiente -= (capitalMes + pagoExtraordinario);
+                totalPagado += (cuotaMensual + pagoExtraordinario);
+                
+                cronograma.push({
+                    mes: mes,
+                    cuota: cuotaMensual,
+                    extra: pagoExtraordinario,
+                    interes: interesMes,
+                    capital: capitalMes,
+                    saldo: Math.max(0, saldoPendiente)
+                });
+                
+                if (saldoPendiente <= 0) break;
+            }
+            
+            return {
+                totalPagado: totalPagado,
+                totalIntereses: totalPagado - capital,
+                mesesReales: cronograma.length,
+                cronograma: cronograma
+            };
+        }
+        
+        function calcularEscenarioPropuesto(capital, cuotaUniforme, pagoExtra, plazo, tasa) {
+            const mesesTotales = plazo * 12;
+            const tasaMensual = tasa / 100 / 12;
+            
+            let saldoPendiente = capital;
+            let totalPagado = 0;
+            let cronograma = [];
+            
+            for (let mes = 1; mes <= mesesTotales; mes++) {
+                let pagoExtraordinario = (mes % 12 === 0) ? pagoExtra : 0;
+                
+                let interesMes = saldoPendiente * tasaMensual;
+                let capitalMes = cuotaUniforme - interesMes;
+                
+                if (capitalMes < 0) capitalMes = 0;
+                
+                saldoPendiente -= (capitalMes + pagoExtraordinario);
+                totalPagado += (cuotaUniforme + pagoExtraordinario);
+                
+                cronograma.push({
+                    mes: mes,
+                    cuota: cuotaUniforme,
+                    extra: pagoExtraordinario,
+                    interes: interesMes,
+                    capital: capitalMes,
+                    saldo: Math.max(0, saldoPendiente)
+                });
+                
+                if (saldoPendiente <= 0) break;
+            }
+            
+            return {
+                totalPagado: totalPagado,
+                totalIntereses: totalPagado - capital,
+                mesesReales: cronograma.length,
+                cronograma: cronograma
+            };
+        }
+        
+        function mostrarResultados(actual, propuesto) {
+            // Resultados Actual
+            document.getElementById('resultados_actual').innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Total a Pagar:</span>
+                    <span class="result-value current">$${formatNumber(Math.round(actual.totalPagado))}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Intereses:</span>
+                    <span class="result-value current">$${formatNumber(Math.round(actual.totalIntereses))}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Duración Real:</span>
+                    <span class="result-value current">${Math.ceil(actual.mesesReales/12)} años (${actual.mesesReales} meses)</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Cuota Máxima:</span>
+                    <span class="result-value current">$17.000.000</span>
+                </div>
+            `;
+            
+            // Resultados Propuesto
+            document.getElementById('resultados_propuesto').innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Total a Pagar:</span>
+                    <span class="result-value proposed">$${formatNumber(Math.round(propuesto.totalPagado))}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Intereses:</span>
+                    <span class="result-value proposed">$${formatNumber(Math.round(propuesto.totalIntereses))}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Duración Real:</span>
+                    <span class="result-value proposed">${Math.ceil(propuesto.mesesReales/12)} años (${propuesto.mesesReales} meses)</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Cuota Uniforme:</span>
+                    <span class="result-value proposed">$${document.getElementById('cuota_uniforme').value}</span>
+                </div>
+            `;
+            
+            // Análisis de diferencias
+            const diferenciaCosto = propuesto.totalPagado - actual.totalPagado;
+            const diferenciaIntereses = propuesto.totalIntereses - actual.totalIntereses;
+            const pagoExtraPropuestoValue = parseFormattedNumber(document.getElementById('pago_extra_propuesto').value);
+            const ahorroAnual = (200000000 - pagoExtraPropuestoValue) * Math.ceil(propuesto.mesesReales/12);
+            
+            let analisisHTML = '';
+            
+            if (diferenciaCosto > 0) {
+                analisisHTML += `
+                    <div class="warning">
+                        <h4>⚠️ Costo Adicional</h4>
+                        <p><strong>Costo extra total:</strong> $${formatNumber(Math.round(diferenciaCosto))}</p>
+                        <p><strong>Intereses adicionales:</strong> $${formatNumber(Math.round(diferenciaIntereses))}</p>
+                    </div>
+                `;
+            }
+            
+            analisisHTML += `
+                <div class="savings">
+                    <h4>✅ Beneficios de tu Propuesta</h4>
+                    <ul>
+                        <li><strong>Estabilidad:</strong> Cuotas uniformes vs salto de $5M a $17M</li>
+                        <li><strong>Flujo de caja:</strong> Pagos extraordinarios reducidos en $${formatNumber(200000000 - pagoExtraPropuestoValue)} anuales</li>
+                        <li><strong>Predictibilidad:</strong> Sin sorpresas en cuota 77</li>
+                        <li><strong>Flexibilidad:</strong> ${Math.ceil(propuesto.mesesReales/12) - 12} años adicionales para generar ingresos</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('analisis_diferencias').innerHTML = analisisHTML;
+        }
+        
+        function generarCronograma(actual, propuesto) {
+            const cronograma = document.getElementById('cronograma');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Año</th>
+                        <th colspan="3">Propuesta Actual</th>
+                        <th colspan="3">Tu Propuesta</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>Cuota Mensual</th>
+                        <th>Pago Anual</th>
+                        <th>Saldo</th>
+                        <th>Cuota Mensual</th>
+                        <th>Pago Anual</th>
+                        <th>Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            const maxAnos = Math.max(Math.ceil(actual.mesesReales/12), Math.ceil(propuesto.mesesReales/12));
+            
+            for (let ano = 1; ano <= maxAnos; ano++) {
+                const mesActual = ano * 12;
+                const mesPropuesto = ano * 12;
+                
+                const dataActual = actual.cronograma[mesActual - 1] || { cuota: 0, extra: 0, saldo: 0 };
+                const dataPropuesto = propuesto.cronograma[mesPropuesto - 1] || { cuota: 0, extra: 0, saldo: 0 };
+                
+                const highlightClass = (ano === 7) ? 'highlight' : '';
+                
+                html += `
+                    <tr class="${highlightClass}">
+                        <td><strong>Año ${ano}</strong></td>
+                        <td>$${formatNumber(Math.round(dataActual.cuota))}</td>
+                        <td>$${formatNumber(Math.round(dataActual.extra))}</td>
+                        <td>$${formatNumber(Math.round(dataActual.saldo))}</td>
+                        <td>$${formatNumber(Math.round(dataPropuesto.cuota))}</td>
+                        <td>$${formatNumber(Math.round(dataPropuesto.extra))}</td>
+                        <td>$${formatNumber(Math.round(dataPropuesto.saldo))}</td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            cronograma.innerHTML = html;
+        }
+        
+        // Calcular automáticamente al cargar
+        window.addEventListener('load', function() {
+            calcularComparacion();
+        });
+        
+        // Recalcular cuando cambien los valores numéricos
+        document.addEventListener('input', function(e) {
+            if (e.target.type === 'number') {
+                calcularComparacion();
+            }
+        });
+    </script>
+</body>
+</html>
